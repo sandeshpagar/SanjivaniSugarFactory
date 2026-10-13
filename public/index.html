@@ -1,0 +1,1100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+  <title>Sanjivani Sugar Factory - Farmer Ledger & AI Copilot</title>
+  
+  <!-- Fonts & Icons from Stitch Design System -->
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@600;700;800&display=swap" rel="stylesheet"/>
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet"/>
+
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          colors: {
+            primary: "#004c22",
+            "primary-container": "#166534",
+            "on-primary": "#ffffff",
+            "on-primary-container": "#93e0a2",
+            secondary: "#904d00",
+            "secondary-container": "#fe932c",
+            "secondary-fixed": "#ffdcc3",
+            "on-secondary-container": "#663500",
+            tertiary: "#054b2c",
+            "tertiary-container": "#266342",
+            "tertiary-fixed": "#b0f1c7",
+            "on-tertiary-fixed-variant": "#0f5132",
+            surface: "#faf8ff",
+            "surface-low": "#f2f3ff",
+            "surface-lowest": "#ffffff",
+            "surface-container": "#eaedff",
+            "surface-container-high": "#e2e7ff",
+            "on-surface": "#131b2e",
+            "on-surface-variant": "#404940",
+            "outline-variant": "#bfc9bd"
+          },
+          fontFamily: {
+            sans: ["Inter", "sans-serif"],
+            title: ["Plus Jakarta Sans", "sans-serif"]
+          }
+        }
+      }
+    };
+  </script>
+  <style>
+    body { font-family: 'Inter', sans-serif; background-color: #faf8ff; }
+    h1, h2, h3, .font-title { font-family: 'Plus Jakarta Sans', sans-serif; }
+    .custom-scroll::-webkit-scrollbar { width: 6px; }
+    .custom-scroll::-webkit-scrollbar-thumb { background-color: #cbd5e1; border-radius: 4px; }
+  </style>
+</head>
+<body class="bg-surface text-on-surface antialiased min-h-screen flex flex-col">
+
+  <!-- ================= TOP HEADER ================= -->
+  <header class="fixed top-0 left-0 right-0 z-50 h-16 bg-surface-lowest border-b border-outline-variant/30 shadow-[0_1px_8px_rgba(0,0,0,0.04)]">
+    <div class="w-full max-w-[1440px] mx-auto h-full px-6 flex items-center justify-between gap-6">
+      
+      <!-- Brand & Unit -->
+      <div class="flex items-center gap-3 shrink-0">
+        <div class="w-10 h-10 rounded-xl bg-primary-container text-on-primary flex items-center justify-center font-bold shadow-sm">
+          <span class="material-symbols-outlined text-[24px]">agriculture</span>
+        </div>
+        <div class="flex flex-col">
+          <div class="flex items-center gap-2">
+            <span class="font-title text-base font-bold text-primary">Sanjivani Sugar Factory</span>
+            <span class="inline-flex items-center px-2 py-0.5 rounded-full bg-surface-container text-on-surface-variant text-xs border border-outline-variant/40">
+              Kopargaon Unit • Season 2025-26
+            </span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Live Search -->
+      <div class="flex-1 max-w-xl mx-auto px-4 hidden md:block">
+        <div class="relative flex items-center w-full">
+          <span class="material-symbols-outlined absolute left-3 text-on-surface-variant text-[20px] pointer-events-none">search</span>
+          <input id="global-search-input" class="w-full h-10 pl-10 pr-4 bg-surface-low text-on-surface text-sm rounded-lg border border-outline-variant/50 focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary placeholder:text-on-surface-variant/70 transition-all" placeholder="Search farmer name, village, slip number..." type="text"/>
+        </div>
+      </div>
+
+      <!-- Live Status & Profile -->
+      <div class="flex items-center gap-4 shrink-0">
+        <div class="hidden lg:flex items-center gap-1.5 px-3 py-1 rounded-full bg-surface-low border border-outline-variant/30">
+          <span class="relative flex h-2 w-2">
+            <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary opacity-75"></span>
+            <span class="relative inline-flex rounded-full h-2 w-2 bg-primary"></span>
+          </span>
+          <span id="db-status-badge" class="text-xs text-on-surface-variant font-medium">PostgreSQL Connected • Live</span>
+        </div>
+
+        <button onclick="fetchData()" class="p-2 rounded-lg text-on-surface-variant hover:bg-surface-container hover:text-on-surface transition-colors" title="Refresh Live Data" type="button">
+          <span class="material-symbols-outlined text-[20px]">refresh</span>
+        </button>
+
+        <div class="flex items-center gap-2 pl-3 border-l border-outline-variant/40">
+          <div class="w-8 h-8 rounded-full bg-primary/10 text-primary font-bold flex items-center justify-center text-xs">
+            RD
+          </div>
+          <div class="hidden xl:flex flex-col text-left">
+            <span class="text-xs font-semibold text-on-surface leading-tight">Rajesh Deshmukh</span>
+            <span class="text-[11px] text-on-surface-variant leading-tight">Factory GM</span>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </header>
+
+  <!-- ================= MAIN LAYOUT ================= -->
+  <div class="flex pt-16 min-h-screen">
+
+    <!-- SIDEBAR -->
+    <aside class="fixed left-0 top-16 bottom-0 w-64 bg-surface-lowest border-r border-outline-variant/30 z-40 flex flex-col justify-between py-4">
+      <div class="flex flex-col gap-2 px-3">
+        <div class="px-3 py-1 text-xs uppercase tracking-wider font-semibold text-on-surface-variant/80">Operations & Ledgers</div>
+        <nav class="flex flex-col gap-1">
+          <button id="nav-btn-ledger" onclick="switchTab('ledger')" class="nav-item flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors bg-primary-container text-on-primary font-semibold">
+            <span class="material-symbols-outlined text-[20px]">receipt_long</span>
+            <span>Farmer Ledger Hub</span>
+          </button>
+          <button id="nav-btn-weighbridge" onclick="switchTab('weighbridge')" class="nav-item flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm text-on-surface-variant hover:bg-surface-container hover:text-on-surface font-medium transition-colors">
+            <span class="material-symbols-outlined text-[20px]">scale</span>
+            <span>Weighbridge Slips</span>
+          </button>
+          <button id="nav-btn-settlement" onclick="switchTab('settlement')" class="nav-item flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm text-on-surface-variant hover:bg-surface-container hover:text-on-surface font-medium transition-colors">
+            <span class="material-symbols-outlined text-[20px]">payments</span>
+            <span>Payment Settlement</span>
+          </button>
+          <button id="nav-btn-copilot" onclick="switchTab('copilot')" class="nav-item flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm text-on-surface-variant hover:bg-surface-container hover:text-on-surface font-medium transition-colors">
+            <span class="material-symbols-outlined text-[20px]">psychology</span>
+            <span>AI Harvest Copilot</span>
+          </button>
+        </nav>
+      </div>
+
+      <div class="px-3 pt-4 border-t border-outline-variant/30">
+        <div class="p-3 rounded-xl bg-surface-low border border-outline-variant/30 flex flex-col gap-1">
+          <div class="flex items-center gap-1.5">
+            <span class="material-symbols-outlined text-primary text-[18px]">smart_toy</span>
+            <span class="text-xs text-primary font-bold">MCP Copilot Active</span>
+          </div>
+          <p class="text-[11px] text-on-surface-variant">PostgreSQL tool calling via Model Context Protocol & OpenAI.</p>
+        </div>
+      </div>
+    </aside>
+
+    <!-- MAIN CONTENT AREA -->
+    <main class="pl-64 w-full flex-1">
+      <div class="w-full max-w-[1440px] mx-auto px-8 py-6 flex flex-col gap-6">
+
+        <!-- Sub-header Breadcrumb Strip -->
+        <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+          <div class="flex flex-col">
+            <div class="flex items-center gap-1 text-xs text-on-surface-variant">
+              <span>Kopargaon Mill Operations</span>
+              <span class="material-symbols-outlined text-[14px]">chevron_right</span>
+              <span>Season 2025-26</span>
+              <span class="material-symbols-outlined text-[14px]">chevron_right</span>
+              <span id="breadcrumb-title" class="text-primary font-semibold">Farmer Ledger Hub</span>
+            </div>
+            <div class="flex items-center gap-3 mt-1">
+              <h1 id="page-main-heading" class="font-title text-2xl font-bold text-on-surface tracking-tight">Crushing Ledger & Copilot Portal</h1>
+              <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-primary/10 text-primary text-xs font-semibold">
+                <span class="w-1.5 h-1.5 rounded-full bg-primary animate-pulse"></span>
+                Crushing Day #84
+              </span>
+            </div>
+          </div>
+
+          <div class="flex items-center gap-3 flex-wrap">
+            <div class="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-surface-container text-on-surface-variant text-xs shadow-sm">
+              <span class="material-symbols-outlined text-primary text-[18px]">verified</span>
+              <span>FRP Benchmark Rate: <strong class="text-on-surface font-semibold">₹3,000 / Ton</strong> (9.5% Sugar Recovery)</span>
+            </div>
+            <button onclick="fetchData()" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-surface-lowest text-on-surface hover:bg-surface-container text-xs font-semibold shadow-sm transition-colors" type="button">
+              <span class="material-symbols-outlined text-[16px] text-on-surface-variant">sync</span>
+              <span>Sync DB</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- 4 KPI SUMMARY METRIC CARDS (CALCULATED FROM REAL POSTGRESQL DATA) -->
+        <section aria-label="Key Performance Indicators" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+          
+          <!-- Card 1: Total Sugarcane Supplied -->
+          <div class="flex flex-col justify-between p-5 rounded-xl bg-surface-lowest shadow-sm border border-outline-variant/30">
+            <div class="flex items-start justify-between">
+              <div class="flex flex-col">
+                <span class="text-xs uppercase tracking-wider text-on-surface-variant font-medium">Total Sugarcane Supplied</span>
+                <span id="kpi-tonnage" class="font-title text-2xl font-bold text-on-surface mt-1 tracking-tight">1,216.90 <span class="text-sm font-normal text-on-surface-variant">Tons</span></span>
+              </div>
+              <div class="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center shrink-0">
+                <span class="material-symbols-outlined text-primary text-[22px]">agriculture</span>
+              </div>
+            </div>
+            <div class="flex items-center justify-between pt-3 mt-3 border-t border-surface-container">
+              <div class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-tertiary-fixed text-on-tertiary-fixed-variant text-xs font-semibold">
+                <span class="material-symbols-outlined text-[14px]">trending_up</span>
+                <span>+14.2% vs last week</span>
+              </div>
+              <span id="kpi-slips-count" class="text-xs text-on-surface-variant">10 Gate Inward Slips</span>
+            </div>
+          </div>
+
+          <!-- Card 2: Total Bill Generated -->
+          <div class="flex flex-col justify-between p-5 rounded-xl bg-surface-lowest shadow-sm border border-outline-variant/30">
+            <div class="flex items-start justify-between">
+              <div class="flex flex-col">
+                <span class="text-xs uppercase tracking-wider text-on-surface-variant font-medium">Total Bill Generated</span>
+                <span id="kpi-total-bill" class="font-title text-2xl font-bold text-on-surface mt-1 tracking-tight">₹36.51 <span class="text-sm font-normal text-on-surface-variant">Lakhs</span></span>
+              </div>
+              <div class="w-10 h-10 rounded-full bg-surface-container flex items-center justify-center shrink-0">
+                <span class="material-symbols-outlined text-on-surface text-[22px]">receipt_long</span>
+              </div>
+            </div>
+            <div class="flex items-center justify-between pt-3 mt-3 border-t border-surface-container">
+              <span class="text-xs text-on-surface-variant flex items-center gap-1">
+                <span class="w-1.5 h-1.5 rounded-full bg-primary"></span>
+                FRP Statutory Rate
+              </span>
+              <span id="kpi-farmers-count" class="text-xs font-semibold text-primary">10 Farmers Enrolled</span>
+            </div>
+          </div>
+
+          <!-- Card 3: Amount Disbursed -->
+          <div class="flex flex-col justify-between p-5 rounded-xl bg-surface-lowest shadow-sm border border-outline-variant/30">
+            <div class="flex items-start justify-between">
+              <div class="flex flex-col">
+                <span class="text-xs uppercase tracking-wider text-on-surface-variant font-medium">Amount Disbursed</span>
+                <span id="kpi-amount-paid" class="font-title text-2xl font-bold text-on-surface mt-1 tracking-tight">₹28.15 <span class="text-sm font-normal text-on-surface-variant">Lakhs</span></span>
+              </div>
+              <div class="w-10 h-10 rounded-full bg-primary-container/20 flex items-center justify-center shrink-0">
+                <span class="material-symbols-outlined text-primary text-[22px]">check_circle</span>
+              </div>
+            </div>
+            <div class="flex flex-col gap-1.5 pt-3 mt-3 border-t border-surface-container">
+              <div class="flex items-center justify-between text-xs">
+                <span id="kpi-paid-badge" class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-tertiary-fixed text-on-tertiary-fixed-variant font-semibold">
+                  Paid (77.1%)
+                </span>
+                <span class="text-on-surface-variant font-medium">Direct RTGS</span>
+              </div>
+              <div class="w-full bg-surface-container rounded-full h-1.5 overflow-hidden">
+                <div id="kpi-progress-bar" class="bg-primary h-1.5 rounded-full transition-all duration-500" style="width: 77.1%"></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Card 4: Pending Payments -->
+          <div class="flex flex-col justify-between p-5 rounded-xl bg-surface-lowest shadow-sm border border-outline-variant/30">
+            <div class="flex items-start justify-between">
+              <div class="flex flex-col">
+                <span class="text-xs uppercase tracking-wider text-on-surface-variant font-medium">Pending Payments</span>
+                <span id="kpi-pending-amount" class="font-title text-2xl font-bold text-secondary mt-1 tracking-tight">₹8.36 <span class="text-sm font-normal text-secondary/80">Lakhs</span></span>
+              </div>
+              <div class="w-10 h-10 rounded-full bg-secondary-fixed/50 flex items-center justify-center shrink-0">
+                <span class="material-symbols-outlined text-secondary text-[22px]">hourglass_top</span>
+              </div>
+            </div>
+            <div class="flex items-center justify-between pt-3 mt-3 border-t border-surface-container">
+              <div class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-secondary-fixed text-on-secondary-container text-xs font-semibold">
+                <span class="w-1.5 h-1.5 rounded-full bg-secondary animate-ping"></span>
+                <span id="kpi-pending-count">8 Farmers Pending</span>
+              </div>
+              <span class="text-xs text-secondary font-medium">Due in 48 Hrs</span>
+            </div>
+          </div>
+
+        </section>
+
+        <!-- LIVE YARD INTAKE SENSOR BAR -->
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-5 items-center p-4 rounded-xl bg-surface-low border border-outline-variant/30 shadow-sm">
+          <div class="flex items-center gap-3 lg:col-span-2">
+            <div class="w-10 h-10 rounded-lg bg-surface-lowest shadow-sm flex items-center justify-center shrink-0 text-primary">
+              <span class="material-symbols-outlined text-[24px]">precision_manufacturing</span>
+            </div>
+            <div class="flex flex-col min-w-0">
+              <div class="flex items-center gap-2">
+                <span class="font-title text-sm font-semibold text-on-surface">Sugar Factory Unit-1 Yard Intake Stream</span>
+                <span class="px-2 py-0.5 rounded bg-primary/10 text-primary text-xs font-semibold">Operational 24/7</span>
+              </div>
+              <p class="text-xs text-on-surface-variant truncate">
+                Weighbridge Station 01 & 02 synchronizing automated gross/tare readings. Real-time moisture recovery: 10.42%.
+              </p>
+            </div>
+          </div>
+          <div class="flex items-center justify-start lg:justify-end gap-6">
+            <div class="flex items-center gap-2">
+              <svg class="w-20 h-7 text-primary" fill="none" viewBox="0 0 96 32">
+                <path d="M2 28L18 22L34 26L50 14L66 18L82 6L94 10" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5"></path>
+                <path d="M2 28L18 22L34 26L50 14L66 18L82 6L94 10V32H2Z" fill="currentColor" fill-opacity="0.1"></path>
+              </svg>
+              <div class="flex flex-col">
+                <span class="text-sm font-bold text-on-surface">148 T/hr</span>
+                <span class="text-[11px] text-on-surface-variant">Crush Rate</span>
+              </div>
+            </div>
+            <div class="h-6 w-px bg-outline-variant/30 hidden sm:block"></div>
+            <div class="flex items-center gap-2">
+              <span class="material-symbols-outlined text-secondary text-[20px]">water_drop</span>
+              <div class="flex flex-col">
+                <span class="text-sm font-bold text-on-surface">11.2%</span>
+                <span class="text-[11px] text-on-surface-variant">Brix Level</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ================= SECTION: TAB VIEWS ================= -->
+
+        <!-- TAB 1: FARMER LEDGER + COPILOT DUAL VIEW -->
+        <div id="tab-ledger" class="tab-content grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+          
+          <!-- LEFT 8 COLS: FARMER LEDGER TABLE -->
+          <section class="lg:col-span-8 flex flex-col p-6 rounded-xl bg-surface-lowest shadow-sm border border-outline-variant/30 gap-5">
+            
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+              <div class="flex flex-col">
+                <div class="flex items-center gap-2">
+                  <span class="material-symbols-outlined text-primary text-[22px]">table_chart_view</span>
+                  <h2 class="font-title text-lg font-bold text-on-surface">Farmers Supply Register</h2>
+                </div>
+                <p class="text-xs text-on-surface-variant mt-0.5">
+                  Live crushing records from PostgreSQL with automated RTGS payout settlement
+                </p>
+              </div>
+              <div class="flex items-center gap-2 shrink-0">
+                <button onclick="exportCSV()" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-surface-container text-on-surface hover:bg-surface-container-high text-xs font-semibold transition-colors" type="button">
+                  <span class="material-symbols-outlined text-[16px]">download</span>
+                  <span>Export CSV</span>
+                </button>
+              </div>
+            </div>
+
+            <!-- Village Filter Chips -->
+            <div class="flex items-center gap-1.5 overflow-x-auto pb-1" id="village-chips-container">
+              <button onclick="filterVillage('all')" class="village-chip px-3 py-1.5 rounded-full bg-primary text-on-primary text-xs font-semibold shrink-0 shadow-sm transition-all" data-v="all">
+                All Villages (<span id="count-all">10</span>)
+              </button>
+              <button onclick="filterVillage('Kopargaon')" class="village-chip px-3 py-1.5 rounded-full bg-surface-low text-on-surface-variant hover:bg-surface-container text-xs shrink-0 transition-all" data-v="Kopargaon">
+                Kopargaon (<span id="count-kopargaon">1</span>)
+              </button>
+              <button onclick="filterVillage('Kolpewadi')" class="village-chip px-3 py-1.5 rounded-full bg-surface-low text-on-surface-variant hover:bg-surface-container text-xs shrink-0 transition-all" data-v="Kolpewadi">
+                Kolpewadi (<span id="count-kolpewadi">1</span>)
+              </button>
+              <button onclick="filterVillage('Puntamba')" class="village-chip px-3 py-1.5 rounded-full bg-surface-low text-on-surface-variant hover:bg-surface-container text-xs shrink-0 transition-all" data-v="Puntamba">
+                Puntamba (<span id="count-puntamba">1</span>)
+              </button>
+              <button onclick="filterVillage('Shirdi')" class="village-chip px-3 py-1.5 rounded-full bg-surface-low text-on-surface-variant hover:bg-surface-container text-xs shrink-0 transition-all" data-v="Shirdi">
+                Shirdi (<span id="count-shirdi">1</span>)
+              </button>
+              <button onclick="filterVillage('Rahata')" class="village-chip px-3 py-1.5 rounded-full bg-surface-low text-on-surface-variant hover:bg-surface-container text-xs shrink-0 transition-all" data-v="Rahata">
+                Rahata (<span id="count-rahata">1</span>)
+              </button>
+            </div>
+
+            <!-- Farmers Table -->
+            <div class="overflow-x-auto -mx-6 px-6">
+              <table class="w-full text-left border-collapse">
+                <thead>
+                  <tr class="bg-surface-low text-on-surface-variant text-xs uppercase tracking-wider font-semibold">
+                    <th class="py-3 px-3 rounded-l-lg">Farmer Name</th>
+                    <th class="py-3 px-3">Village</th>
+                    <th class="py-3 px-3 text-right">Supply (Tons)</th>
+                    <th class="py-3 px-3 text-right">Total Amount</th>
+                    <th class="py-3 px-3 text-right">Paid</th>
+                    <th class="py-3 px-3 text-right">Pending</th>
+                    <th class="py-3 px-3 text-center">Status</th>
+                    <th class="py-3 px-3 text-center rounded-r-lg">Slip</th>
+                  </tr>
+                </thead>
+                <tbody id="farmers-tbody" class="divide-y divide-surface-container text-sm">
+                  <!-- Dynamically populated from PostgreSQL -->
+                  <tr>
+                    <td colspan="8" class="py-8 text-center text-on-surface-variant">
+                      <span class="material-symbols-outlined text-2xl animate-spin text-primary mb-1">progress_activity</span>
+                      <div>Loading records from PostgreSQL...</div>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+
+            <!-- Footer Pagination & Count -->
+            <div class="flex items-center justify-between pt-2 border-t border-surface-container text-xs text-on-surface-variant">
+              <span>Showing <strong id="showing-count" class="text-on-surface">10</strong> registered farmers</span>
+              <span class="text-primary font-medium">Real-time DB Sync Active</span>
+            </div>
+
+          </section>
+
+          <!-- RIGHT 4 COLS: SANJIVANI AI COPILOT WORKSPACE -->
+          <aside class="lg:col-span-4 flex flex-col p-6 rounded-xl bg-surface-lowest shadow-sm border border-outline-variant/30 gap-4 min-h-[640px]">
+            
+            <!-- Copilot Header -->
+            <div class="flex items-start justify-between pb-3 border-b border-surface-container">
+              <div class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-xl bg-primary-container text-on-primary flex items-center justify-center shrink-0 shadow-sm">
+                  <span class="material-symbols-outlined text-[22px]">auto_awesome</span>
+                </div>
+                <div class="flex flex-col">
+                  <div class="flex items-center gap-1.5">
+                    <h2 class="font-title text-base font-bold text-on-surface">Sanjivani AI</h2>
+                    <span class="px-1.5 py-0.5 rounded bg-surface-container text-[11px] text-on-surface-variant font-medium">MCP v1.6</span>
+                  </div>
+                  <div class="flex items-center gap-1.5 mt-0.5">
+                    <span class="relative flex h-2 w-2">
+                      <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary opacity-75"></span>
+                      <span class="relative inline-flex rounded-full h-2 w-2 bg-primary"></span>
+                    </span>
+                    <span class="text-[11px] text-on-surface-variant font-medium">⚡ MCP Connected • PostgreSQL</span>
+                  </div>
+                </div>
+              </div>
+              <button onclick="clearChat()" class="p-1.5 rounded-lg text-on-surface-variant hover:text-on-surface hover:bg-surface-container transition-colors" title="Clear Chat">
+                <span class="material-symbols-outlined text-[18px]">restart_alt</span>
+              </button>
+            </div>
+
+            <!-- Suggested Queries -->
+            <div class="flex flex-col gap-1.5">
+              <span class="text-xs uppercase tracking-wider text-on-surface-variant font-semibold">Suggested Inquiries</span>
+              <div class="flex flex-wrap gap-1.5">
+                <button onclick="sendQuickPrompt('Which farmers have pending payment greater than 100000 rupees in Sanjivani factory?')" class="px-2.5 py-1 rounded-full bg-primary-container/10 hover:bg-primary-container/20 text-primary text-xs font-medium text-left transition-colors">
+                  Pending > ₹1,00,000?
+                </button>
+                <button onclick="sendQuickPrompt('What is the total sugarcane supply and payment summary for Kopargaon village?')" class="px-2.5 py-1 rounded-full bg-surface-low hover:bg-surface-container text-on-surface-variant text-xs font-medium text-left transition-colors">
+                  Kopargaon village summary
+                </button>
+                <button onclick="sendQuickPrompt('Give me a list of all farmers who are fully paid with zero pending balance.')" class="px-2.5 py-1 rounded-full bg-surface-low hover:bg-surface-container text-on-surface-variant text-xs font-medium text-left transition-colors">
+                  Fully paid farmers list
+                </button>
+              </div>
+            </div>
+
+            <!-- Chat Stream -->
+            <div id="chat-stream" class="flex-1 flex flex-col gap-4 overflow-y-auto max-h-[460px] pr-1 custom-scroll">
+              
+              <!-- Initial Welcome Message -->
+              <div class="flex flex-col items-start self-start w-full gap-2">
+                <div class="flex items-center gap-2">
+                  <div class="w-6 h-6 rounded-full bg-primary text-on-primary flex items-center justify-center text-[11px] font-bold">AI</div>
+                  <span class="text-xs font-semibold text-on-surface">Harvester Copilot</span>
+                  <span class="text-[11px] text-on-surface-variant">Just now</span>
+                </div>
+                <div class="p-3.5 rounded-2xl rounded-tl-xs bg-surface-low text-on-surface text-sm w-full leading-relaxed border border-outline-variant/20">
+                  Namaskar! I am connected to the <strong>Sanjivani Sugarcane Factory PostgreSQL database</strong> through standard MCP tools. Ask me about farmer sugarcane tonnage, pending FRP payments, village yields, or weighbridge slip status.
+                </div>
+              </div>
+
+            </div>
+
+            <!-- Chat Input Form -->
+            <form id="chat-form" onsubmit="handleChatSubmit(event)" class="relative flex items-center w-full mt-auto pt-2">
+              <input id="chat-input" class="w-full h-11 pl-4 pr-20 rounded-xl bg-surface-low text-on-surface placeholder:text-on-surface-variant text-xs border border-outline-variant/40 focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary shadow-inner" placeholder="Ask AI about sugarcane yields, payments, or farmers..." type="text"/>
+              <div class="absolute right-1.5 flex items-center gap-1">
+                <button id="chat-send-btn" type="submit" class="w-8 h-8 rounded-lg bg-primary hover:bg-primary-container text-on-primary flex items-center justify-center shadow-sm transition-colors" title="Send Query">
+                  <span class="material-symbols-outlined text-[18px]">arrow_forward</span>
+                </button>
+              </div>
+            </form>
+
+            <div class="flex items-center justify-between text-[11px] text-on-surface-variant px-1">
+              <span>Powered by OpenAI & MCP SDK</span>
+              <span class="flex items-center gap-1 text-primary font-medium">
+                <span class="w-1.5 h-1.5 rounded-full bg-primary"></span>
+                PostgreSQL Live Tool Calling
+              </span>
+            </div>
+
+          </aside>
+
+        </div>
+
+        <!-- TAB 2: WEIGHBRIDGE SLIPS VIEW -->
+        <div id="tab-weighbridge" class="tab-content hidden flex flex-col p-6 rounded-xl bg-surface-lowest shadow-sm border border-outline-variant/30 gap-5">
+          <div class="flex items-center justify-between">
+            <div>
+              <h2 class="font-title text-xl font-bold text-on-surface">Weighbridge Inward Station Slips</h2>
+              <p class="text-xs text-on-surface-variant">Automated gross, tare, net weighment from Station 01 & 02 with moisture and brix readings</p>
+            </div>
+            <button onclick="fetchData()" class="px-3 py-1.5 rounded-lg bg-surface-container text-xs font-semibold hover:bg-surface-container-high transition-colors">
+              Refresh Station
+            </button>
+          </div>
+
+          <div class="overflow-x-auto">
+            <table class="w-full text-left text-sm border-collapse">
+              <thead>
+                <tr class="bg-surface-low text-on-surface-variant text-xs uppercase font-semibold">
+                  <th class="py-3 px-3 rounded-l-lg">Slip ID</th>
+                  <th class="py-3 px-3">Farmer</th>
+                  <th class="py-3 px-3">Vehicle No</th>
+                  <th class="py-3 px-3 text-right">Gross (T)</th>
+                  <th class="py-3 px-3 text-right">Tare (T)</th>
+                  <th class="py-3 px-3 text-right font-bold text-primary">Net Sugar Cane (T)</th>
+                  <th class="py-3 px-3 text-right">Brix %</th>
+                  <th class="py-3 px-3 text-center">Status</th>
+                  <th class="py-3 px-3 text-center rounded-r-lg">Action</th>
+                </tr>
+              </thead>
+              <tbody id="weighbridge-tbody" class="divide-y divide-surface-container">
+                <!-- Dynamically populated -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- TAB 3: PAYMENT SETTLEMENT VIEW -->
+        <div id="tab-settlement" class="tab-content hidden flex flex-col p-6 rounded-xl bg-surface-lowest shadow-sm border border-outline-variant/30 gap-5">
+          <div class="flex items-center justify-between">
+            <div>
+              <h2 class="font-title text-xl font-bold text-on-surface">Fair & Remunerative Price (FRP) Payment Settlement</h2>
+              <p class="text-xs text-on-surface-variant">Statutory 14-day cane payout compliance monitor for Sanjivani Sugar Factory</p>
+            </div>
+            <button onclick="approveBatchPayment()" class="inline-flex items-center gap-1.5 px-4 py-2 rounded-lg bg-primary text-on-primary text-xs font-semibold hover:bg-primary-container shadow-sm transition-colors">
+              <span class="material-symbols-outlined text-[16px]">verified</span>
+              <span>Approve Pending Batch (RTGS)</span>
+            </button>
+          </div>
+
+          <!-- Payout Summary Highlights -->
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div class="p-4 rounded-xl bg-surface-low border border-outline-variant/20">
+              <span class="text-xs text-on-surface-variant uppercase font-semibold">Statutory Settlement Rate</span>
+              <div class="text-xl font-bold text-on-surface mt-1">₹3,000 / Ton</div>
+              <span class="text-xs text-primary font-medium">Maharashtra Zone-2 FRP Mandate</span>
+            </div>
+            <div class="p-4 rounded-xl bg-surface-low border border-outline-variant/20">
+              <span class="text-xs text-on-surface-variant uppercase font-semibold">Total Disbursed to Bank</span>
+              <div id="settlement-paid" class="text-xl font-bold text-primary mt-1">₹28.15 Lakhs</div>
+              <span class="text-xs text-on-surface-variant">Transferred via Bank of Maharashtra</span>
+            </div>
+            <div class="p-4 rounded-xl bg-surface-low border border-outline-variant/20">
+              <span class="text-xs text-on-surface-variant uppercase font-semibold">Immediate Balance Pending</span>
+              <div id="settlement-pending" class="text-xl font-bold text-secondary mt-1">₹8.36 Lakhs</div>
+              <span class="text-xs text-secondary font-medium">Scheduled for Friday RTGS Run</span>
+            </div>
+          </div>
+
+          <div class="overflow-x-auto">
+            <table class="w-full text-left text-sm border-collapse">
+              <thead>
+                <tr class="bg-surface-low text-on-surface-variant text-xs uppercase font-semibold">
+                  <th class="py-3 px-3 rounded-l-lg">Farmer</th>
+                  <th class="py-3 px-3">Village</th>
+                  <th class="py-3 px-3 text-right">Total Payable</th>
+                  <th class="py-3 px-3 text-right">Paid to Date</th>
+                  <th class="py-3 px-3 text-right">Balance Due</th>
+                  <th class="py-3 px-3 text-center">Settlement Status</th>
+                  <th class="py-3 px-3 text-center rounded-r-lg">Bank RTGS</th>
+                </tr>
+              </thead>
+              <tbody id="settlement-tbody" class="divide-y divide-surface-container">
+                <!-- Dynamically populated -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- TAB 4: COPILOT FULL VIEW -->
+        <div id="tab-copilot" class="tab-content hidden flex flex-col p-6 rounded-xl bg-surface-lowest shadow-sm border border-outline-variant/30 gap-5">
+          <div class="flex items-center justify-between">
+            <div>
+              <h2 class="font-title text-xl font-bold text-on-surface">AI Harvest Copilot Analytics</h2>
+              <p class="text-xs text-on-surface-variant">Natural language analysis connected live to PostgreSQL via Model Context Protocol</p>
+            </div>
+            <span class="px-3 py-1 rounded-full bg-primary/10 text-primary text-xs font-semibold">
+              Model: OpenAI GPT-4o-mini • MCP Tool: get_farmers_data
+            </span>
+          </div>
+
+          <div class="p-4 rounded-xl bg-surface-low flex flex-col gap-2">
+            <span class="text-xs uppercase font-semibold text-on-surface-variant">Try Asking Copilot:</span>
+            <div class="flex flex-wrap gap-2">
+              <button onclick="switchTab('ledger'); sendQuickPrompt('Calculate the total revenue generated from Kopargaon and Puntamba villages combined.')" class="px-3 py-1.5 rounded-lg bg-surface-lowest text-xs font-medium text-primary hover:bg-surface-container transition-colors shadow-sm">
+                Revenue from Kopargaon & Puntamba
+              </button>
+              <button onclick="switchTab('ledger'); sendQuickPrompt('Which farmer supplied the highest sugarcane tonnage this season?')" class="px-3 py-1.5 rounded-lg bg-surface-lowest text-xs font-medium text-primary hover:bg-surface-container transition-colors shadow-sm">
+                Highest sugarcane supplier
+              </button>
+              <button onclick="switchTab('ledger'); sendQuickPrompt('Summarize payment pending for farmers who supplied more than 100 tons.')" class="px-3 py-1.5 rounded-lg bg-surface-lowest text-xs font-medium text-primary hover:bg-surface-container transition-colors shadow-sm">
+                Pending balance for > 100 Tons suppliers
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- FOOTER COMPLIANCE STRIP -->
+        <div class="p-5 rounded-xl bg-surface-lowest shadow-sm border border-outline-variant/30 flex flex-col md:flex-row items-center justify-between gap-4">
+          <div class="flex items-center gap-3">
+            <div class="w-10 h-10 rounded-full bg-surface-container flex items-center justify-center text-primary shrink-0">
+              <span class="material-symbols-outlined text-[24px]">balance</span>
+            </div>
+            <div class="flex flex-col">
+              <span class="font-title text-sm font-bold text-on-surface">Fair and Remunerative Price (FRP) Compliance Index</span>
+              <span class="text-xs text-on-surface-variant">Central Government Sugar Directorate Statutory Mandate • Maharashtra Zone-2</span>
+            </div>
+          </div>
+          <div class="flex items-center gap-6">
+            <div class="flex flex-col text-right">
+              <span class="text-sm font-bold text-primary">94.8% Statutory Compliance</span>
+              <span class="text-xs text-on-surface-variant">Within 14-day statutory crushing cycle</span>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </main>
+  </div>
+
+  <!-- ================= SLIP MODAL ================= -->
+  <div id="slip-modal" class="fixed inset-0 z-50 bg-black/40 backdrop-blur-sm hidden flex items-center justify-center p-4">
+    <div class="bg-surface-lowest rounded-2xl max-w-lg w-full p-6 shadow-2xl border border-outline-variant/30 flex flex-col gap-4">
+      <div class="flex items-center justify-between pb-3 border-b border-surface-container">
+        <div class="flex items-center gap-2">
+          <span class="material-symbols-outlined text-primary text-[24px]">receipt</span>
+          <h3 class="font-title text-lg font-bold text-on-surface">Weighbridge Inward Slip</h3>
+        </div>
+        <button onclick="closeModal()" class="text-on-surface-variant hover:text-on-surface">
+          <span class="material-symbols-outlined">close</span>
+        </button>
+      </div>
+
+      <div id="modal-content" class="flex flex-col gap-3 text-sm">
+        <!-- Injected dynamically -->
+      </div>
+
+      <div class="flex items-center justify-end gap-2 pt-3 border-t border-surface-container">
+        <button onclick="window.print()" class="px-4 py-2 rounded-lg bg-surface-container hover:bg-surface-container-high text-xs font-semibold">Print Slip</button>
+        <button onclick="closeModal()" class="px-4 py-2 rounded-lg bg-primary hover:bg-primary-container text-on-primary text-xs font-semibold">Done</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================= FRONTEND JAVASCRIPT ================= -->
+  <script>
+    let allFarmers = [];
+    let currentVillage = 'all';
+
+    // Format Indian Rupees
+    function formatINR(val) {
+      return "₹" + Number(val).toLocaleString('en-IN', { maximumFractionDigits: 2 });
+    }
+
+    // Tab Switching
+    function switchTab(tabId) {
+      document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
+      document.querySelectorAll('.nav-item').forEach(el => {
+        el.classList.remove('bg-primary-container', 'text-on-primary', 'font-semibold');
+        el.classList.add('text-on-surface-variant');
+      });
+
+      const selectedTab = document.getElementById('tab-' + tabId);
+      const selectedBtn = document.getElementById('nav-btn-' + tabId);
+      if (selectedTab) selectedTab.classList.remove('hidden');
+      if (selectedBtn) {
+        selectedBtn.classList.remove('text-on-surface-variant');
+        selectedBtn.classList.add('bg-primary-container', 'text-on-primary', 'font-semibold');
+      }
+
+      const headings = {
+        ledger: 'Crushing Ledger & Copilot Portal',
+        weighbridge: 'Weighbridge Automated Slips & Moisture Queue',
+        settlement: 'FRP Payouts & RTGS Bank Settlement',
+        copilot: 'AI Harvest Copilot Analytics Workspace'
+      };
+      document.getElementById('page-main-heading').innerText = headings[tabId] || 'Crushing Ledger';
+      document.getElementById('breadcrumb-title').innerText = selectedBtn ? selectedBtn.innerText.trim() : 'Portal';
+    }
+
+    // Fetch Stats & Farmers from REST API
+    async function fetchData() {
+      try {
+        const [farmersRes, statsRes, weighbridgeRes] = await Promise.all([
+          fetch('/api/farmers'),
+          fetch('/api/stats'),
+          fetch('/api/weighbridge')
+        ]);
+
+        const farmersData = await farmersRes.json();
+        const statsData = await statsRes.json();
+        const weighbridgeData = await weighbridgeRes.json();
+
+        allFarmers = farmersData.farmers || [];
+        updateKPIs(statsData);
+        renderTable(allFarmers);
+        renderWeighbridge(weighbridgeData.slips || []);
+        renderSettlement(allFarmers);
+        updateVillageCounts(allFarmers);
+      } catch (err) {
+        console.error("Failed to load data:", err);
+      }
+    }
+
+    // Update KPI Cards with Real Data
+    function updateKPIs(stats) {
+      if (!stats) return;
+      document.getElementById('kpi-tonnage').innerHTML = `${Number(stats.total_tons).toFixed(2)} <span class="text-sm font-normal text-on-surface-variant">Tons</span>`;
+      document.getElementById('kpi-total-bill').innerHTML = `₹${(stats.total_amount / 100000).toFixed(2)} <span class="text-sm font-normal text-on-surface-variant">Lakhs</span>`;
+      document.getElementById('kpi-amount-paid').innerHTML = `₹${(stats.amount_paid / 100000).toFixed(2)} <span class="text-sm font-normal text-on-surface-variant">Lakhs</span>`;
+      document.getElementById('kpi-pending-amount').innerHTML = `₹${(stats.payment_pending / 100000).toFixed(2)} <span class="text-sm font-normal text-secondary/80">Lakhs</span>`;
+      
+      document.getElementById('kpi-farmers-count').innerText = `${stats.total_farmers} Farmers Enrolled`;
+      document.getElementById('kpi-slips-count').innerText = `${stats.total_farmers} Gate Inward Slips`;
+      document.getElementById('kpi-pending-count').innerText = `${stats.pending_farmers_count} Farmers Pending`;
+      document.getElementById('kpi-paid-badge').innerText = `Paid (${stats.paid_percentage}%)`;
+      document.getElementById('kpi-progress-bar').style.width = `${stats.paid_percentage}%`;
+
+      document.getElementById('settlement-paid').innerText = `₹${(stats.amount_paid / 100000).toFixed(2)} Lakhs`;
+      document.getElementById('settlement-pending').innerText = `₹${(stats.payment_pending / 100000).toFixed(2)} Lakhs`;
+    }
+
+    // Render Farmers Table
+    function renderTable(farmers) {
+      const tbody = document.getElementById('farmers-tbody');
+      if (!farmers || farmers.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="8" class="py-8 text-center text-on-surface-variant">No farmers found for this filter.</td></tr>`;
+        document.getElementById('showing-count').innerText = '0';
+        return;
+      }
+
+      document.getElementById('showing-count').innerText = farmers.length;
+
+      tbody.innerHTML = farmers.map(f => {
+        const initials = f.name.split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase();
+        const pending = parseFloat(f.payment_pending);
+        let statusBadge = '';
+        if (pending === 0) {
+          statusBadge = `<span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-tertiary-fixed text-on-tertiary-fixed-variant text-xs font-semibold"><span class="w-1.5 h-1.5 rounded-full bg-primary"></span>Paid</span>`;
+        } else if (parseFloat(f.amount_paid) > 0) {
+          statusBadge = `<span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-secondary-fixed text-on-secondary-container text-xs font-semibold"><span class="w-1.5 h-1.5 rounded-full bg-secondary"></span>Partial</span>`;
+        } else {
+          statusBadge = `<span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-red-100 text-red-800 text-xs font-semibold"><span class="w-1.5 h-1.5 rounded-full bg-red-600"></span>Pending</span>`;
+        }
+
+        return `
+          <tr class="hover:bg-surface-low/80 transition-colors group">
+            <td class="py-3 px-3">
+              <div class="flex items-center gap-2.5">
+                <div class="w-8 h-8 rounded-full bg-primary/10 text-primary font-bold text-xs flex items-center justify-center shrink-0">
+                  ${initials}
+                </div>
+                <div class="flex flex-col min-w-0">
+                  <span class="font-semibold text-on-surface group-hover:text-primary transition-colors truncate">${f.name}</span>
+                  <span class="text-[11px] text-on-surface-variant">ID: SNJ-2025-0${800 + f.id}</span>
+                </div>
+              </div>
+            </td>
+            <td class="py-3 px-3">
+              <span class="inline-flex items-center px-2 py-0.5 rounded-md bg-surface-container text-xs text-on-surface">
+                ${f.village}
+              </span>
+            </td>
+            <td class="py-3 px-3 text-right font-medium text-on-surface">
+              ${parseFloat(f.sugarcane_supply_tons).toFixed(2)}
+            </td>
+            <td class="py-3 px-3 text-right font-medium text-on-surface">
+              ${formatINR(f.total_amount)}
+            </td>
+            <td class="py-3 px-3 text-right font-semibold text-primary">
+              ${formatINR(f.amount_paid)}
+            </td>
+            <td class="py-3 px-3 text-right font-bold ${pending > 0 ? 'text-secondary' : 'text-on-surface-variant'}">
+              ${formatINR(f.payment_pending)}
+            </td>
+            <td class="py-3 px-3 text-center">
+              ${statusBadge}
+            </td>
+            <td class="py-3 px-3 text-center">
+              <button onclick="openSlip(${f.id})" class="p-1 rounded-lg text-on-surface-variant hover:text-primary hover:bg-surface-container transition-colors" title="View Inward Slip">
+                <span class="material-symbols-outlined text-[18px]">description</span>
+              </button>
+            </td>
+          </tr>
+        `;
+      }).join('');
+    }
+
+    // Render Weighbridge Slips
+    function renderWeighbridge(slips) {
+      const tbody = document.getElementById('weighbridge-tbody');
+      tbody.innerHTML = slips.map(s => `
+        <tr class="hover:bg-surface-low/80 transition-colors">
+          <td class="py-3 px-3 font-mono text-xs font-semibold text-primary">${s.slip_id}</td>
+          <td class="py-3 px-3 font-medium text-on-surface">${s.farmer_name} <span class="text-xs text-on-surface-variant">(${s.village})</span></td>
+          <td class="py-3 px-3 text-xs text-on-surface-variant">${s.vehicle_no}</td>
+          <td class="py-3 px-3 text-right font-mono">${s.gross_tons.toFixed(2)}</td>
+          <td class="py-3 px-3 text-right font-mono text-on-surface-variant">${s.tare_tons.toFixed(2)}</td>
+          <td class="py-3 px-3 text-right font-mono font-bold text-primary">${s.net_tons.toFixed(2)}</td>
+          <td class="py-3 px-3 text-right text-xs font-medium text-secondary">${s.brix_percentage}%</td>
+          <td class="py-3 px-3 text-center">
+            <span class="px-2 py-0.5 rounded-full text-xs font-semibold ${s.status.includes('Settled') ? 'bg-tertiary-fixed text-on-tertiary-fixed-variant' : 'bg-surface-container text-on-surface'}">${s.status}</span>
+          </td>
+          <td class="py-3 px-3 text-center">
+            <button onclick="openSlip(${s.farmer_id})" class="text-xs text-primary font-semibold hover:underline">View Slip</button>
+          </td>
+        </tr>
+      `).join('');
+    }
+
+    // Render Payment Settlement View
+    function renderSettlement(farmers) {
+      const tbody = document.getElementById('settlement-tbody');
+      tbody.innerHTML = farmers.map(f => {
+        const isPaid = parseFloat(f.payment_pending) === 0;
+        return `
+          <tr class="hover:bg-surface-low/80 transition-colors">
+            <td class="py-3 px-3 font-medium text-on-surface">${f.name}</td>
+            <td class="py-3 px-3 text-xs text-on-surface-variant">${f.village}</td>
+            <td class="py-3 px-3 text-right font-mono">${formatINR(f.total_amount)}</td>
+            <td class="py-3 px-3 text-right font-mono text-primary font-semibold">${formatINR(f.amount_paid)}</td>
+            <td class="py-3 px-3 text-right font-mono font-bold ${isPaid ? 'text-on-surface-variant' : 'text-secondary'}">${formatINR(f.payment_pending)}</td>
+            <td class="py-3 px-3 text-center">
+              <span class="px-2 py-0.5 rounded-full text-xs font-semibold ${isPaid ? 'bg-tertiary-fixed text-on-tertiary-fixed-variant' : 'bg-secondary-fixed text-on-secondary-container'}">
+                ${isPaid ? 'Settled' : 'Batch Pending'}
+              </span>
+            </td>
+            <td class="py-3 px-3 text-center font-mono text-xs text-on-surface-variant">
+              MAHB0001842 ••••${1000 + f.id * 37}
+            </td>
+          </tr>
+        `;
+      }).join('');
+    }
+
+    // Village Filter Logic
+    function filterVillage(village) {
+      currentVillage = village;
+      document.querySelectorAll('.village-chip').forEach(btn => {
+        if (btn.getAttribute('data-v') === village) {
+          btn.classList.add('bg-primary', 'text-on-primary', 'font-semibold', 'shadow-sm');
+          btn.classList.remove('bg-surface-low', 'text-on-surface-variant');
+        } else {
+          btn.classList.remove('bg-primary', 'text-on-primary', 'font-semibold', 'shadow-sm');
+          btn.classList.add('bg-surface-low', 'text-on-surface-variant');
+        }
+      });
+
+      if (village === 'all') {
+        renderTable(allFarmers);
+      } else {
+        const filtered = allFarmers.filter(f => f.village.toLowerCase() === village.toLowerCase());
+        renderTable(filtered);
+      }
+    }
+
+    // Dynamically render chips for all villages from live DB data
+    function updateVillageCounts(farmers) {
+      const container = document.getElementById('village-chips-container');
+      if (!container) return;
+
+      const villageMap = {};
+      farmers.forEach(f => {
+        const v = f.village.trim();
+        villageMap[v] = (villageMap[v] || 0) + 1;
+      });
+
+      let html = `
+        <button onclick="filterVillage('all')" class="village-chip px-3 py-1.5 rounded-full ${currentVillage === 'all' ? 'bg-primary text-on-primary font-semibold shadow-sm' : 'bg-surface-low text-on-surface-variant hover:bg-surface-container'} text-xs shrink-0 transition-all" data-v="all">
+          All Villages (${farmers.length})
+        </button>
+      `;
+
+      Object.entries(villageMap)
+        .sort((a, b) => b[1] - a[1])
+        .forEach(([vName, count]) => {
+          const isSelected = currentVillage.toLowerCase() === vName.toLowerCase();
+          html += `
+            <button onclick="filterVillage('${vName}')" class="village-chip px-3 py-1.5 rounded-full ${isSelected ? 'bg-primary text-on-primary font-semibold shadow-sm' : 'bg-surface-low text-on-surface-variant hover:bg-surface-container'} text-xs shrink-0 transition-all" data-v="${vName}">
+              ${vName} (${count})
+            </button>
+          `;
+        });
+
+      container.innerHTML = html;
+    }
+
+    // Global Search Bar Live Filtering
+    document.getElementById('global-search-input').addEventListener('input', (e) => {
+      const q = e.target.value.toLowerCase().trim();
+      if (!q) {
+        filterVillage(currentVillage);
+        return;
+      }
+      const filtered = allFarmers.filter(f =>
+        f.name.toLowerCase().includes(q) ||
+        f.village.toLowerCase().includes(q) ||
+        `SNJ-2025-0${800 + f.id}`.toLowerCase().includes(q)
+      );
+      renderTable(filtered);
+    });
+
+    // ================= AI COPILOT CHAT =================
+    async function handleChatSubmit(e) {
+      if (e) e.preventDefault();
+      const input = document.getElementById('chat-input');
+      const question = input.value.trim();
+      if (!question) return;
+
+      input.value = '';
+      appendUserMessage(question);
+
+      // Loading Indicator
+      const loadingId = appendLoadingIndicator();
+
+      try {
+        const res = await fetch('/api/copilot', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ question })
+        });
+
+        const data = await res.json();
+        removeLoading(loadingId);
+
+        if (data.toolInvocation) {
+          appendToolExecution(data.toolInvocation);
+        }
+        appendAIMessage(data.answer);
+      } catch (err) {
+        removeLoading(loadingId);
+        appendAIMessage("Error connecting to MCP Copilot: " + err.message);
+      }
+    }
+
+    function sendQuickPrompt(text) {
+      document.getElementById('chat-input').value = text;
+      handleChatSubmit();
+    }
+
+    function appendUserMessage(text) {
+      const stream = document.getElementById('chat-stream');
+      const div = document.createElement('div');
+      div.className = "flex flex-col items-end self-end max-w-[90%] gap-1";
+      div.innerHTML = `
+        <div class="p-3 rounded-2xl rounded-tr-xs bg-primary-container text-on-primary text-xs shadow-sm leading-relaxed">
+          ${text}
+        </div>
+        <div class="flex items-center gap-1 text-[11px] text-on-surface-variant">
+          <span>You</span> • <span>${new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
+        </div>
+      `;
+      stream.appendChild(div);
+      stream.scrollTop = stream.scrollHeight;
+    }
+
+    function appendLoadingIndicator() {
+      const stream = document.getElementById('chat-stream');
+      const id = 'loading-' + Date.now();
+      const div = document.createElement('div');
+      div.id = id;
+      div.className = "flex items-center gap-2 p-3 rounded-xl bg-surface-low text-xs text-on-surface-variant";
+      div.innerHTML = `
+        <span class="material-symbols-outlined text-[18px] text-primary animate-spin">progress_activity</span>
+        <span>Calling MCP tool & querying PostgreSQL...</span>
+      `;
+      stream.appendChild(div);
+      stream.scrollTop = stream.scrollHeight;
+      return id;
+    }
+
+    function removeLoading(id) {
+      const el = document.getElementById(id);
+      if (el) el.remove();
+    }
+
+    function appendToolExecution(tool) {
+      const stream = document.getElementById('chat-stream');
+      const div = document.createElement('div');
+      div.className = "flex flex-col gap-1 p-2.5 rounded-lg bg-surface-low text-xs text-on-surface-variant border border-outline-variant/30";
+      div.innerHTML = `
+        <div class="flex items-center justify-between">
+          <span class="flex items-center gap-1 text-primary font-semibold">
+            <span class="material-symbols-outlined text-[16px]">bolt</span>
+            MCP Tool Invoked: ${tool.name}
+          </span>
+          <span class="font-mono text-[11px] text-on-surface-variant">${tool.durationMs}ms latency</span>
+        </div>
+        <code class="px-2 py-1 rounded bg-surface-lowest font-mono text-[11px] text-on-surface">
+          ${tool.name}(${JSON.stringify(tool.args)})
+        </code>
+      `;
+      stream.appendChild(div);
+      stream.scrollTop = stream.scrollHeight;
+    }
+
+    function appendAIMessage(text) {
+      const stream = document.getElementById('chat-stream');
+      const div = document.createElement('div');
+      div.className = "flex flex-col items-start self-start w-full gap-2";
+      
+      // Basic markdown bold/bullet formatting
+      let formatted = text
+        .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+        .replace(/\n\n/g, '<br/><br/>')
+        .replace(/\n- (.*?)/g, '<br/>• $1');
+
+      div.innerHTML = `
+        <div class="flex items-center gap-2">
+          <div class="w-6 h-6 rounded-full bg-primary text-on-primary flex items-center justify-center text-[11px] font-bold">AI</div>
+          <span class="text-xs font-semibold text-on-surface">Harvester Copilot</span>
+          <span class="text-[11px] text-on-surface-variant">${new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
+        </div>
+        <div class="p-3.5 rounded-2xl rounded-tl-xs bg-surface-low text-on-surface text-xs w-full leading-relaxed border border-outline-variant/20 shadow-sm">
+          ${formatted}
+        </div>
+      `;
+      stream.appendChild(div);
+      stream.scrollTop = stream.scrollHeight;
+    }
+
+    function clearChat() {
+      document.getElementById('chat-stream').innerHTML = `
+        <div class="flex flex-col items-start self-start w-full gap-2">
+          <div class="flex items-center gap-2">
+            <div class="w-6 h-6 rounded-full bg-primary text-on-primary flex items-center justify-center text-[11px] font-bold">AI</div>
+            <span class="text-xs font-semibold text-on-surface">Harvester Copilot</span>
+            <span class="text-[11px] text-on-surface-variant">Reset</span>
+          </div>
+          <div class="p-3.5 rounded-2xl rounded-tl-xs bg-surface-low text-on-surface text-xs w-full leading-relaxed border border-outline-variant/20">
+            Chat cleared. Ask any question to query the Sanjivani factory database!
+          </div>
+        </div>
+      `;
+    }
+
+    // Modal Details
+    function openSlip(farmerId) {
+      const f = allFarmers.find(item => item.id == farmerId);
+      if (!f) return;
+
+      const modal = document.getElementById('slip-modal');
+      const content = document.getElementById('modal-content');
+      content.innerHTML = `
+        <div class="p-3 rounded-xl bg-surface-low flex justify-between items-center">
+          <div>
+            <div class="text-xs text-on-surface-variant">Farmer Name</div>
+            <div class="text-base font-bold text-on-surface">${f.name}</div>
+          </div>
+          <span class="px-2.5 py-1 rounded-full bg-primary/10 text-primary text-xs font-semibold">Village: ${f.village}</span>
+        </div>
+        <div class="grid grid-cols-2 gap-3">
+          <div class="p-2.5 rounded-lg bg-surface-container/50">
+            <div class="text-[11px] text-on-surface-variant">Sugarcane Supply</div>
+            <div class="text-base font-bold text-on-surface">${f.sugarcane_supply_tons} Tons</div>
+          </div>
+          <div class="p-2.5 rounded-lg bg-surface-container/50">
+            <div class="text-[11px] text-on-surface-variant">Total Bill (FRP Rate)</div>
+            <div class="text-base font-bold text-on-surface">${formatINR(f.total_amount)}</div>
+          </div>
+          <div class="p-2.5 rounded-lg bg-surface-container/50">
+            <div class="text-[11px] text-on-surface-variant">Amount Paid</div>
+            <div class="text-base font-bold text-primary">${formatINR(f.amount_paid)}</div>
+          </div>
+          <div class="p-2.5 rounded-lg bg-surface-container/50">
+            <div class="text-[11px] text-on-surface-variant">Pending Balance</div>
+            <div class="text-base font-bold ${f.payment_pending > 0 ? 'text-secondary' : 'text-on-surface-variant'}">${formatINR(f.payment_pending)}</div>
+          </div>
+        </div>
+        <div class="p-2.5 rounded-lg bg-primary/10 text-xs text-on-surface flex items-center gap-2">
+          <span class="material-symbols-outlined text-primary text-[18px]">verified</span>
+          <span>Weighbridge Slip verified by Kopargaon Unit Inward Station.</span>
+        </div>
+      `;
+      modal.classList.remove('hidden');
+    }
+
+    function closeModal() {
+      document.getElementById('slip-modal').classList.add('hidden');
+    }
+
+    function exportCSV() {
+      let csv = "ID,Name,Village,Sugarcane_Tons,Total_Amount,Amount_Paid,Payment_Pending\n";
+      allFarmers.forEach(f => {
+        csv += `${f.id},"${f.name}","${f.village}",${f.sugarcane_supply_tons},${f.total_amount},${f.amount_paid},${f.payment_pending}\n`;
+      });
+      const blob = new Blob([csv], { type: 'text/csv' });
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.setAttribute('href', url);
+      a.setAttribute('download', `Sanjivani_Farmers_Ledger_${new Date().toISOString().slice(0,10)}.csv`);
+      a.click();
+    }
+
+    function approveBatchPayment() {
+      alert("Batch payment approved! Bank RTGS instruction sent for pending balances totaling ₹8.36 Lakhs.");
+    }
+
+    // Initial Load
+    fetchData();
+  </script>
+</body>
+</html>

@@ -1,0 +1,55 @@
+-- Drop existing table if it already exists to allow clean re-runs
+DROP TABLE IF EXISTS farmers;
+
+CREATE TABLE farmers (
+    id SERIAL PRIMARY KEY,
+    name VARCHAR(100) NOT NULL,
+    village VARCHAR(100) NOT NULL,
+    sugarcane_supply_tons NUMERIC(10, 2) NOT NULL,
+    total_amount NUMERIC(12, 2) NOT NULL,
+    amount_paid NUMERIC(12, 2) NOT NULL,
+    payment_pending NUMERIC(12, 2) NOT NULL
+);
+
+-- Seed data: 10 Farmers supplying sugarcane to Sanjivani Factory
+INSERT INTO farmers (name, village, sugarcane_supply_tons, total_amount, amount_paid, payment_pending) VALUES
+('Ramesh Patil', 'Kopargaon', 120.50, 361500.00, 250000.00, 111500.00),
+('Suresh Shinde', 'Kolpewadi', 85.00, 255000.00, 255000.00, 0.00),
+('Dnyaneshwar Pawar', 'Puntamba', 150.00, 450000.00, 300000.00, 150000.00),
+('Balasaheb Deshmukh', 'Shirdi', 95.20, 285600.00, 200000.00, 85600.00),
+('Santosh Kale', 'Rahata', 210.00, 630000.00, 500000.00, 130000.00),
+('Popat Jagtap', 'Yesgaon', 70.00, 210000.00, 210000.00, 0.00),
+('Vitthal More', 'Dhamori', 110.80, 332400.00, 200000.00, 132400.00),
+('Ashok Gavali', 'Pohegaon', 130.00, 390000.00, 350000.00, 40000.00),
+('Sachin Tambe', 'Chitali', 65.40, 196200.00, 150000.00, 46200.00),
+('Baburao Gite', 'Sawalvihir', 180.00, 540000.00, 400000.00, 140000.00),
+('Vishnu Gayke', 'Kopargaon', 140.00, 420000.00, 308000.00, 112000.00),
+('Gorakhnath Vikhe', 'Loni', 260.50, 781500.00, 600000.00, 181500.00),
+('Pandurang Thorat', 'Samvatsar', 95.00, 285000.00, 285000.00, 0.00),
+('Bhausaheb Kolhe', 'Rawande', 175.40, 526200.00, 400000.00, 126200.00),
+('Kalyan Autade', 'Mayegaon', 80.00, 240000.00, 180000.00, 60000.00),
+('Anandrao Gholap', 'Dhotre', 115.20, 345600.00, 345600.00, 0.00),
+('Navnath Kadu', 'Jeur', 220.00, 660000.00, 500000.00, 160000.00),
+('Tukaram Bankar', 'Korhale', 135.50, 406500.00, 300000.00, 106500.00),
+('Madhavrao Shelke', 'Babhaleshwar', 190.00, 570000.00, 450000.00, 120000.00),
+('Shantaram Sasane', 'Sakuri', 75.60, 226800.00, 226800.00, 0.00),
+('Appasaheb Mhaske', 'Nimgaon', 310.00, 930000.00, 700000.00, 230000.00),
+('Diliprao Kadam', 'Kopargaon', 105.00, 315000.00, 250000.00, 65000.00),
+('Eknath Jadhav', 'Kolpewadi', 160.80, 482400.00, 350000.00, 132400.00),
+('Khanderao Chavan', 'Puntamba', 88.50, 265500.00, 265500.00, 0.00),
+('Murlidhar Gaikwad', 'Shirdi', 145.00, 435000.00, 320000.00, 115000.00),
+('Ravindra Sonawane', 'Rahata', 205.20, 615600.00, 450000.00, 165600.00),
+('Bhagwan Wagh', 'Yesgaon', 68.00, 204000.00, 204000.00, 0.00),
+('Sampat Salunke', 'Dhamori', 125.00, 375000.00, 280000.00, 95000.00),
+('Nivrutti Kharde', 'Pohegaon', 155.00, 465000.00, 350000.00, 115000.00),
+('Shivaji Landge', 'Chitali', 92.40, 277200.00, 200000.00, 77200.00),
+('Haribhau Bidve', 'Sawalvihir', 170.00, 510000.00, 400000.00, 110000.00),
+('Gopinath Darekar', 'Samvatsar', 82.50, 247500.00, 247500.00, 0.00),
+('Uttamrao Chaudhari', 'Rawande', 230.00, 690000.00, 500000.00, 190000.00),
+('Somnath Dare', 'Mayegaon', 110.00, 330000.00, 250000.00, 80000.00),
+('Janardhan Kute', 'Dhotre', 142.50, 427500.00, 300000.00, 127500.00),
+('Kisanrao Dukre', 'Jeur', 98.00, 294000.00, 294000.00, 0.00),
+('Maruti Ghule', 'Korhale', 215.00, 645000.00, 480000.00, 165000.00),
+('Bhimrao Kokate', 'Babhaleshwar', 128.00, 384000.00, 300000.00, 84000.00),
+('Arunrao Pote', 'Sakuri', 85.00, 255000.00, 255000.00, 0.00),
+('Subhashrao Dighe', 'Nimgaon', 195.00, 585000.00, 420000.00, 165000.00);
